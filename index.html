@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width", initial-scale="1.0">
+        <title>Distancle</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <h1> How Far Apart?</h1>
+                <p class="subtitle"> Guess the distance between two cities</p>
+            </header>
+            <div class="game-area">
+                <div class="cities-display">
+                    <div class="city">
+                        <span id="city1">Loading...</span>
+                    </div>
+                    <div class="distance-icon">↔</div>
+                    <div class="city">
+                        <span id=""city2">Loading...</span>
+                    </div>
+                </div>
+                <div class="input-section">
+                    <label for="guess">Your guess (in kilometers):</label>
+                    <input type="number" id="guess" placeholder="Enter distance" min="0">
+                    <button id="submit-btn">Submit Guess</button>
+                </div>
+                <div id="result" class="result hidden"></div>
+                <div class="stats">
+                    <div class="stat">
+                        <span class ="stat-label">Score:</span>
+                        <span id="score">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Round:</span>
+                        <span id="round">0</span>
+                    </div>
+                </div>
+                <button id="next-btn" class="hidden">Next Round</button>
+                <button id="restart-btn">Restart Game</button>
+            </div>
+        </div>
+        <script src="distancle.js"></script>
+    </body>
+</html>
