@@ -45,6 +45,39 @@ h1 {
     gap: 30px;
 }
 
+.globe-container {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    background: #000;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.globe {
+    width: 100%;
+    height: 100%;
+}
+
+.toggle-globe-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+    padding: 8px 16px;
+    font-size: 0.9em;
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+}
+
+.toggle-globe-btn:hover {
+    background: white;
+}
+
+.globe-container.hidden-globe {
+    display: none;
+}
+
 .cities-display {
     display: flex;
     justify-content: space-around;
@@ -187,6 +220,70 @@ button {
 
 .hidden {
     display: none;
+}
+
+.start-screen {
+    text-align: center;
+    padding: 40px 0;
+}
+
+.instructions {
+    margin-bottom: 40px;
+}
+
+.instructions h2 {
+    color: #667eea;
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.instructions p {
+    color: #555;
+    font-size: 1.1em;
+    line-height: 1.8;
+    margin-bottom: 10px;
+}
+
+.start-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 1.3em;
+    padding: 20px 50px;
+}
+
+.start-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.end-screen {
+    text-align: center;
+    padding: 40px 0;
+}
+
+.end-screen h2 {
+    color: #667eea;
+    font-size: 2.5em;
+    margin-bottom: 30px;
+}
+
+.final-score {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 40px;
+    margin-bottom: 40px;
+}
+
+.score-label {
+    color: #666;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.score-value {
+    color: #667eea;
+    font-size: 4em;
+    font-weight: bold;
 }
 
 @media (max-width: 600px) {

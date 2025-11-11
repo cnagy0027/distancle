@@ -9,19 +9,38 @@
     <body>
         <div class="container">
             <header>
-                <h1> How Far Apart?</h1>
+                <h1>Distancle</h1>
                 <p class="subtitle"> Guess the distance between two cities</p>
             </header>
-            <div class="game-area">
+
+            <div id="start-screen" class="start-screen">
+                <div class="instructions">
+                    <h2>How to Play</h2>
+                    <p>Two cities will be shown on the screen.</p>
+                    <p>Your job is to guess the distance between them in kilomters.</p>
+                    <p>You have five guesses to get as close as possible.</p>
+                </div>
+                <button id="start-btn" class="start-button">Start Game</button>
+            </div>
+
+            <div class="game-area hidden">
+                <div class="globe-container" id="globe-container">
+                    <button id="toggle-globe" class="toggle-globe-btn">Hide Globe</button>
+                    <div id="globe" class="globe"></div>
+                </div>
+                
                 <div class="cities-display">
                     <div class="city">
                         <span id="city1">Loading...</span>
                     </div>
+
                     <div class="distance-icon">↔</div>
+
                     <div class="city">
-                        <span id=""city2">Loading...</span>
+                        <span id="city2">Loading...</span>
                     </div>
                 </div>
+
                 <div class="input-section">
                     <label for="guess">Your guess (in kilometers):</label>
                     <input type="number" id="guess" placeholder="Enter distance" min="0">
@@ -41,6 +60,16 @@
                 <button id="next-btn" class="hidden">Next Round</button>
                 <button id="restart-btn">Restart Game</button>
             </div>
+            
+            <div id="end-screen" class="end-screen hidden">
+                <h2>Game Over</h2>
+                <div class="final-score">
+                    <p class="score-label">Final Score</p>
+                    <p id="final-score" class="score-value">0</p>
+                </div>
+                <button id="new-game-btn" class="start-button">Start New Game</button>
+            </div>
+
         </div>
         <script src="distancle.js"></script>
     </body>

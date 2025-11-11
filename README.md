@@ -1,9 +1,10 @@
 # Distancle
 
 
-what do i need to do:
-
-- index.html
-- cities.json
-- distancle.js
-- style.css
+Features to build:
+- minimum population
+- filter by country
+- Show map with cities
+- Have 5 rounds
+- Revise UI
+- Add country to city when displaying
