@@ -35,17 +35,18 @@ async function loadCities() {
         console.log('Loaded ${cities.length} cities');
     } catch (error) {
         console.error('Error loading cities:', error);
-        alert('Error loading citieees. Please check cities.json file.');
+        alert('Error loading cities. Please check cities.json file.');
     }
 }
 
 let scene, camera, renderer, globe, markers = [];
 let isDragging = false;
-let previousMousePosition = {x: 0, y: 0};
+let previousMousePosition = { x: 0, y: 0 };
 let globeVisible = true;
 
 function initGlobe() {
     scene = new THREE.Scene();
+
     camera = new THREE.PerspectiveCamera(75, globeEl.clientWidth / globeEl.clientHeight, 0.1, 1000);
     camera.position.z = 2.5;
 
@@ -54,30 +55,37 @@ function initGlobe() {
     globeEl.appendChild(renderer.domElement);
 
     const geometry = new THREE.SphereGeometry(1, 64, 64);
+
+    const textureLoader = new THREE.TextureLoader();
+    const earthTexture = textureLoader.load('https://unpkg.com/three-globe/example/img/earth-day.jpg');
+    
     const material = new THREE.MeshPhongMaterial({
-        color: 0x2233ff,
-        emissive: 0x112244,
-        shininess: 10
+        map: earthTexture,
+        shininess: 5
     });
     globe = new THREE.Mesh(geometry, material);
-    scene.add(globe);
+    
+    globe.rotation.y = Math.PI;
 
-    const wireframe = new THREE.WireframeGeometry(geometry);
-    const lineMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00, opacity: 0.3, transparent: true });
-    const line = new THREE.LineSegments(wireframe, lineMaterial);
-    globe.add(line);
+    scene.add(globe);
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
 
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(5,3,5);
+    directionalLight.position.set(5, 3, 5);
     scene.add(directionalLight);
 
     globeEl.addEventListener('mousedown', onMouseDown);
     globeEl.addEventListener('mousemove', onMouseMove);
     globeEl.addEventListener('mouseup', onMouseUp);
     globeEl.addEventListener('mouseleave', onMouseUp);
+
+    // Prevent image dragging
+    renderer.domElement.addEventListener('dragstart', (e) => e.preventDefault());
+    
+    // Mouse wheel zoom
+    globeEl.addEventListener('wheel', onMouseWheel);
 
     window.addEventListener('resize', onWindowResize);
 
@@ -86,18 +94,22 @@ function initGlobe() {
 
 function latLonToVector3(lat, lon, radius = 1) {
     const phi = (90 - lat) * (Math.PI / 180);
-    const theta = (lon + 180) * (Math.PI / 180);
-
-    const x = -(radius * Math.sin(phi) * Math.cos(theta));
-    const y = radius * Math.sin(phi) * Math.sin(theta);
-    const z = radius * Math.cos(phi);
-
+    const theta = (-lon) * (Math.PI / 180);
+    
+    const x = radius * Math.sin(phi) * Math.cos(theta);
+    const z = radius * Math.sin(phi) * Math.sin(theta);
+    const y = radius * Math.cos(phi);
+    
     return new THREE.Vector3(x, y, z);
 }
 
 function addCityMarker(lat, lon, color) {
     const markerGeometry = new THREE.SphereGeometry(0.02, 16, 16);
-    const markerMaterial = new THREE.MeshBasicMaterial({color: color});
+    const markerMaterial = new THREE.MeshBasicMaterial({
+        color: color,
+        emissive: color,
+        emissiveIntensity: 0.5
+    });
     const marker = new THREE.Mesh(markerGeometry, markerMaterial);
 
     const position = latLonToVector3(lat, lon, 1.01);
@@ -114,6 +126,24 @@ function clearMarkers() {
         globe.remove(marker);
     });
     markers = [];
+}
+
+// Debug function - add test markers
+function addTestMarkers() {
+    clearMarkers();
+    // 0°N, 0°E - Should be in Gulf of Guinea off west Africa
+    addCityMarker(0, 0, 0xff0000);
+    // 0°N, 90°E - Should be in Indian Ocean near Sumatra
+    addCityMarker(0, 90, 0x00ff00);
+    // 0°N, -90°W - Should be in Pacific Ocean near Galapagos
+    addCityMarker(0, -90, 0x0000ff);
+    // 45°N, 0°E - Should be in France
+    addCityMarker(45, 0, 0xffff00);
+    console.log("Test markers added:");
+    console.log("Red: 0°N, 0°E (Gulf of Guinea)");
+    console.log("Green: 0°N, 90°E (Indian Ocean)");
+    console.log("Blue: 0°N, -90°W (Pacific)");
+    console.log("Yellow: 45°N, 0°E (France)");
 }
 
 function onMouseDown(e) {
@@ -137,6 +167,20 @@ function onMouseUp() {
     isDragging = false;
 }
 
+
+function onMouseWheel(e) {
+    e.preventDefault();
+    
+    // Zoom in/out by adjusting camera position
+    const zoomSpeed = 0.1;
+    const delta = e.deltaY > 0 ? 1 : -1;
+    
+    camera.position.z += delta * zoomSpeed;
+    
+    // Limit zoom range
+    camera.position.z = Math.max(1.5, Math.min(5, camera.position.z));
+}
+
 function onWindowResize() {
     if (!globeEl.clientWidth) return;
     camera.aspect = globeEl.clientWidth / globeEl.clientHeight;
@@ -146,11 +190,6 @@ function onWindowResize() {
 
 function animate() {
     requestAnimationFrame(animate);
-
-    if (!isDragging) {
-        globe.rotation.y += 0.001;
-    }
-
     renderer.render(scene, camera);
 }
 
@@ -172,6 +211,7 @@ function startGame() {
 
     if (!renderer) {
         initGlobe();
+        // setTimeout(() => addTestMarkers(), 500);
     }
 
     startNewRound();
@@ -216,7 +256,7 @@ function getRandomCities() {
 
 // Start a new round
 function startNewRound() {
-    if(round >= MAX_ROUNDS) {
+    if (round >= MAX_ROUNDS) {
         endGame();
         return;
     }
@@ -229,12 +269,16 @@ function startNewRound() {
     city1El.textContent = `${currentCity1.name}, ${getCountryName(currentCity1.country)}`;
     city2El.textContent = `${currentCity2.name}, ${getCountryName(currentCity2.country)}`;
 
+    clearMarkers();
+    addCityMarker(currentCity1.lat, currentCity1.lon, 0xff0000); // Red for city 1
+    addCityMarker(currentCity2.lat, currentCity2.lon, 0x00ff00); // Green for city 2
+
     actualDistance = calculateDistance(
         currentCity1.lat, currentCity1.lon,
         currentCity2.lat, currentCity2.lon
     );
 
-    console.log('Actual Distance: ${actualDistance} km');
+    console.log(`Actual distance: ${actualDistance} km`);
 
     // Reset UI
     guessInput.value = '';
@@ -250,7 +294,7 @@ function startNewRound() {
 
 // Calculate score based on accuracy
 function calculateScore(guess, actual) {
-    const percentError = (Math.abs(guess - actual) / actual) * 100;
+    const percentError = Math.abs(guess - actual) / actual * 100;
 
     if (percentError <= 100) {
         return 100 - Math.floor(percentError);
