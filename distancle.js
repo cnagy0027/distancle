@@ -81,6 +81,10 @@ function initGlobe() {
     globeEl.addEventListener('mouseup', onMouseUp);
     globeEl.addEventListener('mouseleave', onMouseUp);
 
+    globeEl.addEventListener('touchstart', onTouchStart);
+    globeEl.addEventListener('touchmove', onTouchMove);
+    globeEl.addEventListener('touchend', onTouchEnd);
+
     // Prevent image dragging
     renderer.domElement.addEventListener('dragstart', (e) => e.preventDefault());
     
@@ -179,6 +183,72 @@ function onMouseWheel(e) {
     
     // Limit zoom range
     camera.position.z = Math.max(1.5, Math.min(5, camera.position.z));
+}
+
+// Touch event handlers for mobile
+function onTouchStart(e) {
+    if (e.touches.length === 1) {
+        e.preventDefault();
+        isDragging = true;
+        previousMousePosition = {
+            x: e.touches[0].clientX,
+            y: e.touches[0].clientY
+        };
+    } else if (e.touches.length === 2) {
+        // Pinch zoom start
+        e.preventDefault();
+        isDragging = false;
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        initialPinchDistance = Math.sqrt(dx * dx + dy * dy);
+    }
+}
+
+function onTouchMove(e) {
+    if (e.touches.length === 1 && isDragging) {
+        // Single finger drag
+        e.preventDefault();
+        const touch = e.touches[0];
+        const deltaX = touch.clientX - previousMousePosition.x;
+        const deltaY = touch.clientY - previousMousePosition.y;
+        
+        globe.rotation.y += deltaX * 0.005;
+        globe.rotation.x += deltaY * 0.005;
+        
+        previousMousePosition = {
+            x: touch.clientX,
+            y: touch.clientY
+        };
+    } else if (e.touches.length === 2) {
+        // Pinch zoom
+        e.preventDefault();
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (initialPinchDistance) {
+            const delta = initialPinchDistance - distance;
+            camera.position.z += delta * 0.01;
+            camera.position.z = Math.max(1.5, Math.min(5, camera.position.z));
+            initialPinchDistance = distance;
+        }
+    }
+}
+
+function onTouchEnd(e) {
+    e.preventDefault();
+    if (e.touches.length === 0) {
+        isDragging = false;
+        initialPinchDistance = null;
+    } else if (e.touches.length === 1) {
+        // One finger lifted during pinch, switch back to drag
+        isDragging = true;
+        previousMousePosition = {
+            x: e.touches[0].clientX,
+            y: e.touches[0].clientY
+        };
+        initialPinchDistance = null;
+    }
 }
 
 function onWindowResize() {
